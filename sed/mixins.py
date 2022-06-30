@@ -1,5 +1,5 @@
 from email.mime.multipart import MIMEMultipart
-from email.mime.base import MIMEBase
+from email.mime.application import MIMEApplication
 from email.mime.text import MIMEText
 from email import encoders
 import smtplib
@@ -14,29 +14,36 @@ class FilenameTranslator:
 class MessageCreator(FilenameTranslator):
     subject = None
     message_body = None
-    attached_file = None
+    attached_files: list = []
     email_from = None
     filename = None
 
-    def create_message(self):
+    async def create_message(self):
         msg = MIMEMultipart()
         msg['Subject'] = self.subject
         msg['From'] = self.email_from
         msg.attach(MIMEText(self.message_body))
-        part = MIMEBase('application', "octet-stream")
-        if self.attached_file:
-            part.set_payload(self.attached_file)
-            self.filename = self.translate_ru(self.filename)
+        if not self.attached_files:
+            self.attached_files = []
+        for file in self.attached_files:
+            part = MIMEApplication(
+                await file.read(),
+                Name=file.filename
+            )
             encoders.encode_base64(part)
             part['Content-Disposition'] = 'attachment; filename="%s"' % \
-                                          self.filename
+                                          self.translate_ru(file.filename)
             msg.attach(part)
         return msg
 
 
 class MessageBodyCreator:
+    request_identifier = None
+
     def get_msg_body(self):
-        return ''
+        body = f'Номер обращения - {self.request_identifier}\n' \
+               f'From site - True\n\n'
+        return body
 
 
 class IndividualMessageBodyCreator(MessageBodyCreator):
@@ -47,11 +54,12 @@ class IndividualMessageBodyCreator(MessageBodyCreator):
 
     def get_msg_body(self):
         """ Создать тело сообщения для обращения от физ.лица """
+        source_body = super().get_msg_body()
         body = f'Имя - {self.user_name}\n' \
                f'Телефон - {self.user_phone}\n' \
-               f'Email- {self.user_email}\n' \
+               f'Email - {self.user_email}\n' \
                f'Запрос - {self.user_text}\n'
-        return body
+        return source_body + body
 
 
 class EntityMessageBodyCreator(MessageBodyCreator):
@@ -59,14 +67,17 @@ class EntityMessageBodyCreator(MessageBodyCreator):
     company_email = None
     contact_person = None
     contact_phone = None
+    user_text = None
 
     def get_msg_body(self):
         """ Создать тело сообщения для юр.лица """
+        source_body = super().get_msg_body()
         body = f'ИНН компании - {self.company_inn}\n\n' \
                f'Контактное лицо - {self.contact_person}\n' \
                f'Телефон контактного лица - {self.contact_phone}\n' \
-               f'Email контактного лица - {self.company_email}\n'
-        return body
+               f'Email контактного лица - {self.company_email}\n' \
+               f'Запрос - {self.user_text}\n'
+        return source_body + body
 
 
 class PersonalAccountGetRequest(MessageBodyCreator):
@@ -108,8 +119,16 @@ class MessageSender:
 
 class MailWorker(MessageCreator, MessageBodyCreator, MessageSender):
 
-    def form_mail(self):
+    async def form_mail(self):
         self.message_body = self.get_msg_body()
-        message = self.create_message()
+        message = await self.create_message()
         server = self.get_server_auth()
         return self.send_mail(server, message=message.as_string())
+
+
+class IdentifierGenerator:
+    request_type = None
+    request_num = None
+
+    def get_request_identifier(self):
+        return f'02-{self.request_type}-В-{self.request_num}'

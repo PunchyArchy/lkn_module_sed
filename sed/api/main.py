@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Query, File, UploadFile
 from sed import main as main_workers
 from sed.logger.main import logger
+from typing import List, Union
 
 logger.info('Инициализация API')
 
@@ -21,19 +22,17 @@ async def create_individual_request(
         user_text=Query(..., description='Текст обращения пользователя'),
         request_num=Query(...,
                           description='Номер обращения (из нашей системы)'),
-        fileobject: UploadFile = File(None, description='Загружаемый файл')):
+        files_list: List[UploadFile] = File(None,
+                                            description='Загружаемые файлы')):
     """ Создать обращение от физического лица """
     logger.info(f'Создание запроса для физ.лица ({locals()})')
-    filename = fileobject.filename
-    fileobject_read = await fileobject.read()
     inst = main_workers.IndividualRequestsMailWorker(
         user_name=user_name,
         user_phone=user_phone,
         user_email=user_email,
         user_text=user_text,
         request_num=request_num,
-        fileobject=fileobject_read,
-        filename=filename)
+        files_list=files_list)
     response = await inst.form_send_mail()
     return response
 
@@ -45,19 +44,19 @@ async def create_entity_request(
         contact_phone=Query(..., description='Телефон для связи'),
         contact_email=Query(None, description='Email для связи'),
         request_num=Query(..., description='Номер обращения'),
-        fileobject: UploadFile = File(None, description='Загружаемый файл')):
+        user_text=Query(..., description='Текст обращения'),
+        files_list: List[UploadFile] = File(None,
+                                            description='Загружаемые файлы')):
     """ Создать обращение от юридического лица """
     logger.info(f'Создание запроса для юр.лица ({locals()})')
-    filename = fileobject.filename
-    fileobject_read = await fileobject.read()
     inst = main_workers.EntityRequestsMailWorker(
         company_inn=company_inn,
         contact_person=contact_person,
         contact_phone=contact_phone,
         contact_email=contact_email,
         request_num=request_num,
-        fileobject=fileobject_read,
-        filename=filename
+        user_text=user_text,
+        files_list=files_list
     )
     response = await inst.form_send_mail()
     return response

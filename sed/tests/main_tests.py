@@ -49,5 +49,6 @@ class TestCase(unittest.TestCase):
         )
         inst.form_send_mail()
 
+
 if __name__ == '__main__':
     unittest.main()
