@@ -3,12 +3,17 @@ from sed import main as main_workers
 from sed.logger.main import logger
 from typing import List
 
-logger.info('Инициализация API')
-
 app = FastAPI(title='ЛКН. Модуль для работы с СЭД',
-              description='Модуль предназначен для взаимодействия с '
-                          'СЭД (Система Электронного Документооборота) '
-                          'РО "Эко-Сити" в рамках разработки ЛКН.',
+              description='API взаимодействия с СЭД РО "Эко-сити". '
+                          'Суть АПИ в том, что дергая нижеописанные ручки, мы '
+                          'отправляем соответсвующие запросы на мыло "Эко-Сити".'
+                          '\nТам эти запросы будут оформлены как заявки для '
+                          'исполнения менеджерами.'
+                          '\nНомер заявки мы должны генерить с нашей стороны, '
+                          'это число-буквенный номер, но при дергании ручки '
+                          'передаем только числа, и уже под капотом сгенерится '
+                          'правильный номер. Т.е. передаешь 148, на выходе '
+                          'будет что-то типа "02-Ю-В-148"',
               contact={'name': 'Qodex.PunchyArchy',
                        'url': 'http://about.qodex.tech/'},
               version='0.1.0')
@@ -24,7 +29,7 @@ async def create_individual_request(
                           description='Номер обращения (из нашей системы)'),
         files_list: List[UploadFile] = File(None,
                                             description='Загружаемые файлы')):
-    """ Создать обращение от физического лица """
+    """ Создать произвольное обращение от физического лица """
     logger.info(f'Создание запроса для физ.лица ({locals()})')
     inst = main_workers.IndividualRequestsMailWorker(
         user_name=user_name,
@@ -68,7 +73,7 @@ async def create_entity_request(
         user_text=Query(..., description='Текст обращения'),
         files_list: List[UploadFile] = File(None,
                                             description='Загружаемые файлы')):
-    """ Создать обращение от юридического лица """
+    """ Создать произвольное обращение от юридического лица """
     logger.info(f'Создание запроса для юр.лица ({locals()})')
     inst = main_workers.EntityRequestsMailWorker(
         company_inn=company_inn,
@@ -83,7 +88,8 @@ async def create_entity_request(
     return response
 
 
-@app.post('/create_entity_new_point_request', tags=['Точки вывозов'])
+@app.post('/create_entity_new_point_request', tags=['Точки вывозов',
+                                                    'Юр. лица'])
 async def create_entity_new_point_request(
         company_inn=Query(None, description='ИНН компании'),
         contact_person=Query(None, description='Контактное лицо (имя)'),
@@ -116,6 +122,7 @@ async def create_personal_account_request(
                              description='Адрес, по которому юзер пытался'
                                          'получить лицевой счет'),
         request_num=Query(..., description='Номер обращения')):
+    """ Создать запрос на получение номера лицевого счета """
     logger.info(f'Создание запроса на получение лицевого счета ({locals()})')
     inst = main_workers.PersonalAccountGetRequestMailWorker(
         user_phone=user_phone,
