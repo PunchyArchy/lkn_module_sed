@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Query, File, UploadFile
 from sed import main as main_workers
 from sed.logger.main import logger
-from typing import List, Union
+from typing import List
 
 logger.info('Инициализация API')
 
@@ -14,7 +14,7 @@ app = FastAPI(title='ЛКН. Модуль для работы с СЭД',
               version='0.1.0')
 
 
-@app.post('/create_individual_request', tags=['Обращения'])
+@app.post('/create_individual_request', tags=['Физ. лица'])
 async def create_individual_request(
         user_name=Query(None, description='Имя пользователя'),
         user_phone=Query(..., description='Телефон пользователя'),
@@ -37,7 +37,28 @@ async def create_individual_request(
     return response
 
 
-@app.post('/create_entity_request', tags=['Обращения'])
+@app.post('/create_entity_email_failed_request', tags=['Юр. лица'])
+async def create_entity_email_failed_request(
+        inn=Query(..., description='ИНН компании'),
+        failed_email=Query(...,
+                           description='ИНН из БД (не прошедший валидацию)', ),
+        request_num=Query(..., description='Номер заявки (только цифры)')):
+    """ Дергать, когда валидация email из БД не прошла. В СЭД упадет заявка,
+    что бы менеджер скорректировал email юр.лица """
+    logger.info(f'Создание запроса на восстановление доступа по ИНН')
+    inst = main_workers.EntityRequestsMailWorker(
+        company_inn=inn,
+        contact_email=failed_email,
+        contact_phone='Неизвестно',
+        contact_person='Неизвестно',
+        request_num=request_num,
+        user_text='Пользователь не смог авторизоваться по ИНН, '
+                  'поскольку в базе неверно указан email: {failed_email}')
+    response = await inst.form_send_mail()
+    return response
+
+
+@app.post('/create_entity_request', tags=['Юр. лица'])
 async def create_entity_request(
         company_inn=Query(None, description='ИНН компании'),
         contact_person=Query(None, description='Контактное лицо (имя)'),
@@ -86,7 +107,8 @@ async def create_entity_new_point_request(
     return await inst.form_send_mail()
 
 
-@app.post('/create_personal_account_request', tags=['Лицевые счета'])
+@app.post('/create_personal_account_request', tags=['Лицевые счета',
+                                                    'Физ. лица', 'Юр. лица'])
 async def create_personal_account_request(
         user_phone=Query(..., description='Номер пользователя'),
         user_email=Query(None, description='Email пользователя'),
