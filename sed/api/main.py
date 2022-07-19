@@ -39,7 +39,7 @@ async def create_individual_request(
         request_num=request_num,
         files_list=files_list)
     response = await inst.form_send_mail()
-    return response
+    return inst.get_request_identifier()
 
 
 @app.post('/create_entity_email_failed_request', tags=['Юр. лица'])
@@ -60,7 +60,7 @@ async def create_entity_email_failed_request(
         user_text='Пользователь не смог авторизоваться по ИНН, '
                   'поскольку в базе неверно указан email: {failed_email}')
     response = await inst.form_send_mail()
-    return response
+    return inst.get_request_identifier()
 
 
 @app.post('/create_entity_request', tags=['Юр. лица'])
@@ -85,7 +85,7 @@ async def create_entity_request(
         files_list=files_list
     )
     response = await inst.form_send_mail()
-    return response
+    return inst.get_request_identifier()
 
 
 @app.post('/create_entity_new_point_request', tags=['Точки вывозов',

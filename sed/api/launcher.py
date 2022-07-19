@@ -3,4 +3,4 @@ import sys
 import uvicorn
 
 
-uvicorn.run(app, host=sys.argv[1], port=int(sys.argv[2]))
+uvicorn.run(app, host='0.0.0.0', port=8001)
