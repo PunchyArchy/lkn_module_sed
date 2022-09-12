@@ -42,7 +42,10 @@ class MessageResponseCreator:
 
     def get_msg_body(self):
         body = f"Ваше обращение успешно зарегистрировано под номером: " \
-               f"{self.request_identifier}"
+               f"{self.request_identifier}.\n" \
+               f"Мы уже работаем над ее решением, скоро с Вами свяжется " \
+               f"наш специалист.\n" \
+               f"С уважением РО 'Эко-Сити'"
         return body
 
 

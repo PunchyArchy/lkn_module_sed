@@ -28,7 +28,7 @@ class ResponseCreator(SedInfo,
     def __init__(self, request_num, email_for_response):
         self.request_identifier = request_num
         self.request_num = request_num
-        self.subject = 'Ваше обращение уже принято в работу!'
+        self.subject = 'ЭКО-Сити. Ваше обращение принято в работу!'
         self.email_to = email_for_response
 
 
