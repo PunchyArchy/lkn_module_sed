@@ -37,11 +37,22 @@ class MessageCreator(FilenameTranslator):
         return msg
 
 
-class MessageBodyCreator:
+class MessageResponseCreator:
     request_identifier = None
 
     def get_msg_body(self):
+        body = f"Ваше обращение успешно зарегистрировано под номером: " \
+               f"{self.request_identifier}"
+        return body
+
+
+class MessageBodyCreator:
+    request_identifier = None
+    bill_num = None
+
+    def get_msg_body(self):
         body = f'Номер обращения - {self.request_identifier}\n' \
+               f'Номер лицевого счета - {self.bill_num}\n' \
                f'From site - True\n\n'
         return body
 
@@ -127,8 +138,8 @@ class MailWorker(MessageCreator, MessageBodyCreator, MessageSender):
 
 
 class IdentifierGenerator:
-    request_type = None
-    request_num = None
+    request_type = None  # Ф/Ю
+    request_num = None  # Номер обращения из нашей системы
 
     def get_request_identifier(self):
         return f'02-{self.request_type}-В-{self.request_num}'

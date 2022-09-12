@@ -16,14 +16,15 @@ class TestCase(unittest.TestCase):
             filepath='pdf-test.pdf')
         inst.form_send_mail()
 
-    @unittest.SkipTest
     def test_entity_requests(self):
         inst = main.EntityRequestsMailWorker(
             company_inn='123',
             contact_phone='88005553535',
             contact_person='Иван Михайлович',
             contact_email='test_mail@gmail.com',
-            request_num='1009')
+            request_num='1009',
+        files_list=[],
+        user_text='')
         inst.form_send_mail()
 
     @unittest.SkipTest
@@ -40,6 +41,7 @@ class TestCase(unittest.TestCase):
         )
         inst.form_send_mail()
 
+    @unittest.SkipTest
     def test_request_account(self):
         inst = main.PersonalAccountGetRequestMailWorker(
             user_phone='3312',
@@ -47,6 +49,11 @@ class TestCase(unittest.TestCase):
             failed_address='Улица Пушкина, дом Колотушкина',
             request_num='0044'
         )
+        inst.form_send_mail()
+
+    def test_response_creator(self):
+        inst = main.ResponseCreator('123', 'lktest@roecocity.ru')
+        print("TT")
         inst.form_send_mail()
 
 

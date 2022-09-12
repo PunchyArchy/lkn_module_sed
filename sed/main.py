@@ -22,12 +22,22 @@ class SedInfo(MailWorker):
     server_port = 465
 
 
+class ResponseCreator(SedInfo,
+                      mixins.MessageResponseCreator,
+                      MailWorker):
+    def __init__(self, request_num, email_for_response):
+        self.request_identifier = request_num
+        self.request_num = request_num
+        self.subject = 'Ваше обращение уже принято в работу!'
+        self.email_to = email_for_response
+
+
 class IndividualRequestsMailWorker(SedInfo,
                                    mixins.IndividualMessageBodyCreator,
                                    MailWorker,
                                    mixins.IdentifierGenerator):
     def __init__(self, user_name, user_phone, user_email, user_text,
-                 request_num, files_list):
+                 request_num, files_list, bill_num):
         self.user_name = user_name
         self.user_phone = user_phone
         self.user_email = user_email
@@ -45,7 +55,8 @@ class EntityRequestsMailWorker(SedInfo,
                                MailWorker,
                                mixins.IdentifierGenerator):
     def __init__(self, company_inn, contact_person, contact_phone,
-                 contact_email, request_num, user_text, files_list=None):
+                 contact_email, request_num, user_text, files_list=None,
+                 bill_num=None):
         self.company_inn = company_inn
         self.contact_person = contact_person
         self.company_email = contact_email

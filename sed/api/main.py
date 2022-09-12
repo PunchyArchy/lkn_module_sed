@@ -28,7 +28,8 @@ async def create_individual_request(
         request_num=Query(...,
                           description='Номер обращения (из нашей системы)'),
         files_list: List[UploadFile] = File(None,
-                                            description='Загружаемые файлы')):
+                                            description='Загружаемые файлы'),
+        bill_num=Query('Не указан', description='Номер лицевого счета')):
     """ Создать произвольное обращение от физического лица """
     logger.info(f'Создание запроса для физ.лица ({locals()})')
     inst = main_workers.IndividualRequestsMailWorker(
@@ -37,7 +38,8 @@ async def create_individual_request(
         user_email=user_email,
         user_text=user_text,
         request_num=request_num,
-        files_list=files_list)
+        files_list=files_list,
+        bill_num=bill_num)
     response = await inst.form_send_mail()
     return inst.get_request_identifier()
 
@@ -72,7 +74,8 @@ async def create_entity_request(
         request_num=Query(..., description='Номер обращения'),
         user_text=Query(..., description='Текст обращения'),
         files_list: List[UploadFile] = File(None,
-                                            description='Загружаемые файлы')):
+                                            description='Загружаемые файлы'),
+        bill_num=Query('Не указан', description='Номер лицевого счета')):
     """ Создать произвольное обращение от юридического лица """
     logger.info(f'Создание запроса для юр.лица ({locals()})')
     inst = main_workers.EntityRequestsMailWorker(
@@ -131,3 +134,14 @@ async def create_personal_account_request(
         request_num=request_num
     )
     return await inst.form_send_mail()
+
+
+@app.post('/create_user_response', tags=['Лицевые счета',
+                                                    'Физ. лица', 'Юр. лица'])
+async def create_user_response(email_to=Query(...,
+                                              description='Email куда слать ответ'),
+                               request_num=Query(..., description='Номер обращения')):
+    inst = main_workers.ResponseCreator(email_for_response=email_to,
+                                        request_num=request_num)
+    return await inst.form_send_mail()
+
