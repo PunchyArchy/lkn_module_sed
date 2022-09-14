@@ -47,6 +47,7 @@ class IndividualRequestsMailWorker(SedInfo,
         self.attached_files = files_list
         self.email_to = settings.email_to_individual
         self.request_type = 'Ф'
+        self.bill_num = bill_num
         self.request_identifier = self.get_request_identifier()
 
 
@@ -67,6 +68,7 @@ class EntityRequestsMailWorker(SedInfo,
         self.user_text = user_text
         self.email_to = settings.email_to_juridical
         self.request_type = 'Ю'
+        self.bill_num = bill_num
         self.request_identifier = self.get_request_identifier()
 
 
