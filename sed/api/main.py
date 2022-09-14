@@ -60,7 +60,7 @@ async def create_entity_email_failed_request(
         contact_person='Неизвестно',
         request_num=request_num,
         user_text='Пользователь не смог авторизоваться по ИНН, '
-                  'поскольку в базе неверно указан email: {failed_email}')
+                  'поскольку в базе неверно указан email: {failed_email}'),
     response = await inst.form_send_mail()
     return inst.get_request_identifier()
 
@@ -85,7 +85,8 @@ async def create_entity_request(
         contact_email=contact_email,
         request_num=request_num,
         user_text=user_text,
-        files_list=files_list
+        files_list=files_list,
+        bill_num=bill_num
     )
     response = await inst.form_send_mail()
     return inst.get_request_identifier()
