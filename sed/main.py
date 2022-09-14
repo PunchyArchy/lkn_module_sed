@@ -56,8 +56,8 @@ class EntityRequestsMailWorker(SedInfo,
                                MailWorker,
                                mixins.IdentifierGenerator):
     def __init__(self, company_inn, contact_person, contact_phone,
-                 contact_email, request_num, user_text, files_list=None,
-                 bill_num=None):
+                 contact_email, request_num, user_text, bill_num,
+                 files_list=None):
         self.company_inn = company_inn
         self.contact_person = contact_person
         self.company_email = contact_email
