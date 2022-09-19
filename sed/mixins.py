@@ -52,10 +52,12 @@ class MessageResponseCreator:
 class MessageBodyCreator:
     request_identifier = None
     bill_num = None
+    auth = False
 
     def get_msg_body(self):
         body = f'Номер обращения - {self.request_identifier}\n' \
                f'Номер лицевого счета - {self.bill_num}\n' \
+               f'auth - {self.auth}\n' \
                f'From site - True\n\n'
         return body
 

@@ -37,8 +37,9 @@ class IndividualRequestsMailWorker(SedInfo,
                                    MailWorker,
                                    mixins.IdentifierGenerator):
     def __init__(self, user_name, user_phone, user_email, user_text,
-                 request_num, files_list, bill_num):
+                 request_num, files_list, bill_num, auth):
         self.user_name = user_name
+        self.auth = auth
         self.user_phone = user_phone
         self.user_email = user_email
         self.user_text = user_text
@@ -59,6 +60,7 @@ class EntityRequestsMailWorker(SedInfo,
                  contact_email, request_num, user_text, bill_num,
                  files_list=None):
         self.company_inn = company_inn
+        self.auth = auth
         self.contact_person = contact_person
         self.company_email = contact_email
         self.contact_phone = contact_phone

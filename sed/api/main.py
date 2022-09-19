@@ -29,7 +29,8 @@ async def create_individual_request(
                           description='Номер обращения (из нашей системы)'),
         files_list: List[UploadFile] = File(None,
                                             description='Загружаемые файлы'),
-        bill_num=Query('Не указан', description='Номер лицевого счета')):
+        bill_num=Query('Не указан', description='Номер лицевого счета'),
+        auth=Query(False, description='Авторизованный пользователь')):
     """ Создать произвольное обращение от физического лица """
     logger.info(f'Создание запроса для физ.лица ({locals()})')
     inst = main_workers.IndividualRequestsMailWorker(
@@ -39,7 +40,8 @@ async def create_individual_request(
         user_text=user_text,
         request_num=request_num,
         files_list=files_list,
-        bill_num=bill_num)
+        bill_num=bill_num,
+        auth=auth)
     response = await inst.form_send_mail()
     return inst.get_request_identifier()
 
@@ -75,7 +77,8 @@ async def create_entity_request(
         user_text=Query(..., description='Текст обращения'),
         files_list: List[UploadFile] = File(None,
                                             description='Загружаемые файлы'),
-        bill_num=Query('Не указан', description='Номер лицевого счета')):
+        bill_num=Query('Не указан', description='Номер лицевого счета'),
+        auth=Query(False, description='Авторизованный пользователь')):
     """ Создать произвольное обращение от юридического лица """
     logger.info(f'Создание запроса для юр.лица ({locals()})')
     inst = main_workers.EntityRequestsMailWorker(
@@ -86,7 +89,8 @@ async def create_entity_request(
         request_num=request_num,
         user_text=user_text,
         files_list=files_list,
-        bill_num=bill_num
+        bill_num=bill_num,
+        auth=auth
     )
     response = await inst.form_send_mail()
     return inst.get_request_identifier()
