@@ -106,7 +106,11 @@ async def create_entity_new_point_request(
         request_num=Query(..., description='Номер обращения'),
         container_name=Query(..., description='Имя объекта'),
         container_addr=Query(..., description='Адрес объекта'),
-        container_type=Query(..., description='Тип контейнера')):
+        container_type=Query(..., description='Тип контейнера'),
+        points = Query([],
+                       description='Точки вывозов (список списков, в котором '
+                                   'элемент #0 - это название (вывеска), '
+                                   '#1 - адрес точки.')):
     """ Создать обращение с просьбой зарегистрировать новую точку вывоза """
     logger.info(f'Создание запроса для создания точки от юр.лица ({locals()})')
     inst = main_workers.EntityPointRequestsMailWorker(
@@ -115,9 +119,7 @@ async def create_entity_new_point_request(
         contact_phone=contact_phone,
         contact_email=contact_email,
         request_num=request_num,
-        container_name=container_name,
-        container_addr=container_addr,
-        container_type=container_type)
+        points=points)
     return await inst.form_send_mail()
 
 

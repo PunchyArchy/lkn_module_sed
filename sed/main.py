@@ -79,8 +79,7 @@ class EntityPointRequestsMailWorker(EntityRequestsMailWorker,
     """ Заявка на оформление новой точки от юридического лица"""
 
     def __init__(self, company_inn, contact_person, contact_phone,
-                 contact_email, request_num,
-                 container_name, container_addr, container_type):
+                 contact_email, request_num, points):
         super().__init__(company_inn=company_inn,
                          contact_person=contact_person,
                          contact_phone=contact_phone,
@@ -88,18 +87,16 @@ class EntityPointRequestsMailWorker(EntityRequestsMailWorker,
                          request_num=request_num,
                          user_text=None)
         self.subject = f'Заявка на оформление точки вывоза #{request_num}'
-        self.container_name = container_name
-        self.container_addr = container_addr
-        self.container_type = container_type
+        self.points = points
         self.email_to = settings.email_to_juridical
         self.request_type = 'Ю'
         self.request_identifier = self.get_request_identifier()
 
     def get_msg_body(self):
         msg_body = super().get_msg_body()
-        msg_body += f'\nНазвание объекта - {self.container_name}\n' \
-                    f'Адрес объекта - {self.container_addr}\n ' \
-                    f'Тип контейнера - {self.container_type}\n'
+        for point in self.points:
+            msg_body += f'\nНазвание объекта - {point[0]}\n' \
+                        f'Адрес объекта - {point[1]}\n '
         return msg_body
 
 
