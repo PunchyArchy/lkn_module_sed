@@ -1,6 +1,7 @@
 import os
 from sed import settings
 from sed import mixins
+from typing import List, Union
 
 
 class MailWorker(mixins.MessageCreator, mixins.MessageBodyCreator,
@@ -85,12 +86,16 @@ class EntityPointRequestsMailWorker(EntityRequestsMailWorker,
                          contact_phone=contact_phone,
                          contact_email=contact_email,
                          request_num=request_num,
+                         bill_num=None,
                          user_text=None)
         self.subject = f'Заявка на оформление точки вывоза #{request_num}'
         self.points = points
         self.email_to = settings.email_to_juridical
         self.request_type = 'Ю'
         self.request_identifier = self.get_request_identifier()
+        # Разбиваем список на множество списков по 2 элементов
+        self.points = [self.points[i:i + 2] for i in range(0, len(self.points), 2)]
+        print('NEW POINTS', self.points)
 
     def get_msg_body(self):
         msg_body = super().get_msg_body()

@@ -46,27 +46,6 @@ async def create_individual_request(
     return inst.get_request_identifier()
 
 
-@app.post('/create_entity_email_failed_request', tags=['Юр. лица'])
-async def create_entity_email_failed_request(
-        inn=Query(..., description='ИНН компании'),
-        failed_email=Query(...,
-                           description='ИНН из БД (не прошедший валидацию)', ),
-        request_num=Query(..., description='Номер заявки (только цифры)')):
-    """ Дергать, когда валидация email из БД не прошла. В СЭД упадет заявка,
-    что бы менеджер скорректировал email юр.лица """
-    logger.info(f'Создание запроса на восстановление доступа по ИНН')
-    inst = main_workers.EntityRequestsMailWorker(
-        company_inn=inn,
-        contact_email=failed_email,
-        contact_phone='Неизвестно',
-        contact_person='Неизвестно',
-        request_num=request_num,
-        user_text='Пользователь не смог авторизоваться по ИНН, '
-                  'поскольку в базе неверно указан email: {failed_email}'),
-    response = await inst.form_send_mail()
-    return inst.get_request_identifier()
-
-
 @app.post('/create_entity_request', tags=['Юр. лица'])
 async def create_entity_request(
         company_inn=Query(None, description='ИНН компании'),
@@ -104,13 +83,11 @@ async def create_entity_new_point_request(
         contact_phone=Query(..., description='Телефон для связи'),
         contact_email=Query(None, description='Email для связи'),
         request_num=Query(..., description='Номер обращения'),
-        container_name=Query(..., description='Имя объекта'),
-        container_addr=Query(..., description='Адрес объекта'),
-        container_type=Query(..., description='Тип контейнера'),
-        points = Query([],
-                       description='Точки вывозов (список списков, в котором '
+        points: List = Query([],
+                       description='Точки вывозов (список, в котором '
                                    'элемент #0 - это название (вывеска), '
-                                   '#1 - адрес точки.')):
+                                   '#1 - адрес точки..'
+                                   '#2 - Название второй точки, #-3 адрес второй точки и тд. т.е список [0,1,  2,3,  4,5]')):
     """ Создать обращение с просьбой зарегистрировать новую точку вывоза """
     logger.info(f'Создание запроса для создания точки от юр.лица ({locals()})')
     inst = main_workers.EntityPointRequestsMailWorker(
