@@ -80,6 +80,8 @@ class IndividualMessageBodyCreator(MessageBodyCreator):
 
 class EntityMessageBodyCreator(MessageBodyCreator):
     company_inn = None
+    company_kpp = None
+    company_name = None
     company_email = None
     contact_person = None
     contact_phone = None
@@ -88,8 +90,9 @@ class EntityMessageBodyCreator(MessageBodyCreator):
     def get_msg_body(self):
         """ Создать тело сообщения для юр.лица """
         source_body = super().get_msg_body()
-        body = f'ИНН компании - {self.company_inn}\n\n' \
-               f'Контактное лицо - {self.contact_person}\n' \
+        body = f'Название компании - {self.company_name}\n' \
+               f'ИНН компании - {self.company_inn}\n' \
+               f'КПП компании - {self.company_kpp}\n\n' \
                f'Телефон контактного лица - {self.contact_phone}\n' \
                f'Email контактного лица - {self.company_email}\n' \
                f'Запрос - {self.user_text}\n'

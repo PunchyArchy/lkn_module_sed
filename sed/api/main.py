@@ -49,6 +49,8 @@ async def create_individual_request(
 @app.post('/create_entity_request', tags=['Юр. лица'])
 async def create_entity_request(
         company_inn=Query(None, description='ИНН компании'),
+        company_kpp=Query(None, description='КПП компании'),
+        company_name=Query(None, description='Название компании'),
         contact_person=Query(None, description='Контактное лицо (имя)'),
         contact_phone=Query(..., description='Телефон для связи'),
         contact_email=Query(None, description='Email для связи'),
@@ -61,7 +63,9 @@ async def create_entity_request(
     """ Создать произвольное обращение от юридического лица """
     logger.info(f'Создание запроса для юр.лица ({locals()})')
     inst = main_workers.EntityRequestsMailWorker(
+        company_name=company_name,
         company_inn=company_inn,
+        company_kpp=company_kpp,
         contact_person=contact_person,
         contact_phone=contact_phone,
         contact_email=contact_email,

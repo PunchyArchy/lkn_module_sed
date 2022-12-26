@@ -59,8 +59,11 @@ class EntityRequestsMailWorker(SedInfo,
                                mixins.IdentifierGenerator):
     def __init__(self, company_inn, contact_person, contact_phone,
                  contact_email, request_num, user_text, bill_num,
-                 files_list=None, auth=False):
+                 files_list=None, auth=False, company_kpp=None,
+                 company_name=None):
         self.company_inn = company_inn
+        self.company_kpp = company_kpp
+        self.company_name = company_name
         self.auth = auth
         self.contact_person = contact_person
         self.company_email = contact_email
@@ -95,7 +98,6 @@ class EntityPointRequestsMailWorker(EntityRequestsMailWorker,
         self.request_identifier = self.get_request_identifier()
         # Разбиваем список на множество списков по 2 элементов
         self.points = [self.points[i:i + 2] for i in range(0, len(self.points), 2)]
-        print('NEW POINTS', self.points)
 
     def get_msg_body(self):
         msg_body = super().get_msg_body()
