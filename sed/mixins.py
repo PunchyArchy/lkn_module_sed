@@ -17,11 +17,13 @@ class MessageCreator(FilenameTranslator):
     attached_files: list = []
     email_from = None
     filename = None
+    email_to = None
 
     async def create_message(self):
         msg = MIMEMultipart()
         msg['Subject'] = self.subject
         msg['From'] = self.email_from
+        msg['To'] = self.email_to
         msg.attach(MIMEText(self.message_body))
         if not self.attached_files:
             self.attached_files = []
