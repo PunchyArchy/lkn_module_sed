@@ -1,7 +1,5 @@
-import os
 from sed import settings
 from sed import mixins
-from typing import List, Union
 
 
 class MailWorker(mixins.MessageCreator, mixins.MessageBodyCreator,
@@ -33,18 +31,30 @@ class ResponseCreator(SedInfo,
         self.email_to = email_for_response
 
 
+class ResponseCreatorHTML(mixins.MessageResponseCreatorHTML,
+                          mixins.MessageCreatorHTML,
+                          ResponseCreator):
+    def __init__(self, request_num, email_for_response):
+        super(ResponseCreatorHTML, self).__init__(request_num,
+                                                  email_for_response)
+
+        self.html_file_path = f"{settings.INTERNAL_DIR}\\html_messages\\" \
+                              f"no_reply\\index.html"
+
+
 class IndividualRequestsMailWorker(SedInfo,
                                    mixins.IndividualMessageBodyCreator,
                                    MailWorker,
                                    mixins.IdentifierGenerator):
     def __init__(self, user_name, user_phone, user_email, user_text,
-                 request_num, files_list, bill_num, auth):
+                 request_num, files_list, bill_num, auth, territory):
         self.user_name = user_name
         self.auth = auth
         self.user_phone = user_phone
         self.user_email = user_email
         self.user_text = user_text
         self.request_num = request_num
+        self.territory = territory
         self.subject = f'Обращение физ.лица #{request_num}'
         self.attached_files = files_list
         self.email_to = settings.email_to_individual
@@ -60,11 +70,12 @@ class EntityRequestsMailWorker(SedInfo,
     def __init__(self, company_inn, contact_person, contact_phone,
                  contact_email, request_num, user_text, bill_num,
                  files_list=None, auth=False, company_kpp=None,
-                 company_name=None):
+                 company_name=None, territory=None):
         self.company_inn = company_inn
         self.company_kpp = company_kpp
         self.company_name = company_name
         self.auth = auth
+        self.territory = territory
         self.contact_person = contact_person
         self.company_email = contact_email
         self.contact_phone = contact_phone
@@ -97,7 +108,8 @@ class EntityPointRequestsMailWorker(EntityRequestsMailWorker,
         self.request_type = 'Ю'
         self.request_identifier = self.get_request_identifier()
         # Разбиваем список на множество списков по 2 элементов
-        self.points = [self.points[i:i + 2] for i in range(0, len(self.points), 2)]
+        self.points = [self.points[i:i + 2] for i in
+                       range(0, len(self.points), 2)]
 
     def get_msg_body(self):
         msg_body = super().get_msg_body()

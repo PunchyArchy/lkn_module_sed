@@ -39,6 +39,15 @@ class MessageCreator(FilenameTranslator):
         return msg
 
 
+class MessageCreatorHTML(MessageCreator):
+    async def create_message(self):
+        msg = MIMEText(self.message_body, 'html')
+        msg['Subject'] = self.subject
+        msg['From'] = self.email_from
+        msg['To'] = self.email_to
+        return msg
+
+
 class MessageResponseCreator:
     request_identifier = None
 
@@ -51,16 +60,31 @@ class MessageResponseCreator:
         return body
 
 
+class MessageResponseCreatorHTML(MessageResponseCreator):
+    html_file_path = None
+
+    def get_msg_body(self):
+        html = open(self.html_file_path)
+        html_read = html.read()
+        print(html_read)
+        html_read = html_read.replace('MAIN_NUMBER_REPLACE_FOR', self.request_identifier)
+        return html_read
+
+
 class MessageBodyCreator:
     request_identifier = None
     bill_num = None
     auth = False
+    territory = None
 
     def get_msg_body(self):
         body = f'Номер обращения - {self.request_identifier}\n' \
                f'Номер лицевого счета - {self.bill_num}\n' \
                f'auth - {self.auth}\n' \
-               f'From site - True\n\n'
+               f'From site - True\n'
+        if self.territory:
+            body += f'Территория - {self.territory}\n'
+        body += '\n'
         return body
 
 
