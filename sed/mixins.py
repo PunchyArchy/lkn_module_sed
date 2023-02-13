@@ -66,7 +66,6 @@ class MessageResponseCreatorHTML(MessageResponseCreator):
     def get_msg_body(self):
         html = open(self.html_file_path)
         html_read = html.read()
-        print(html_read)
         html_read = html_read.replace('MAIN_NUMBER_REPLACE_FOR', self.request_identifier)
         return html_read
 

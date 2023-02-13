@@ -1,5 +1,6 @@
 from sed import settings
 from sed import mixins
+import os
 
 
 class MailWorker(mixins.MessageCreator, mixins.MessageBodyCreator,
@@ -37,9 +38,12 @@ class ResponseCreatorHTML(mixins.MessageResponseCreatorHTML,
     def __init__(self, request_num, email_for_response):
         super(ResponseCreatorHTML, self).__init__(request_num,
                                                   email_for_response)
-
-        self.html_file_path = f"{settings.INTERNAL_DIR}\\html_messages\\" \
-                              f"no_reply\\index.html"
+        self.html_templates_path = os.path.join(settings.INTERNAL_DIR,
+                                                'html_messages')
+        self.html_no_reply_dir = os.path.join(self.html_templates_path,
+                                              'no_reply')
+        self.html_file_path = os.path.join(self.html_no_reply_dir,
+                                           'index.html')
 
 
 class IndividualRequestsMailWorker(SedInfo,
