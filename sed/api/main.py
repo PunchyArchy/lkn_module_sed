@@ -105,7 +105,9 @@ async def create_entity_new_point_request(
         contact_email=contact_email,
         request_num=request_num,
         points=points)
-    return await inst.form_send_mail()
+    response = await inst.form_send_mail()
+    return inst.get_request_identifier()
+
 
 
 @app.post('/create_personal_account_request', tags=['Лицевые счета',
