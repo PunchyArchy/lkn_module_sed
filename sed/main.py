@@ -35,9 +35,10 @@ class ResponseCreator(SedInfo,
 class ResponseCreatorHTML(mixins.MessageResponseCreatorHTML,
                           mixins.MessageCreatorHTML,
                           ResponseCreator):
-    def __init__(self, request_num, email_for_response):
+    def __init__(self, request_num, email_for_response, request_text=None):
         super(ResponseCreatorHTML, self).__init__(request_num,
                                                   email_for_response)
+        self.request_text = request_text
         self.html_templates_path = os.path.join(settings.INTERNAL_DIR,
                                                 'html_messages')
         self.html_no_reply_dir = os.path.join(self.html_templates_path,

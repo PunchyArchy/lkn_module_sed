@@ -146,7 +146,11 @@ async def create_user_response(email_to=Query(...,
 async def create_user_response_html(email_to=Query(...,
                                                    description='Email куда слать ответ'),
                                     request_num=Query(...,
-                                                      description='Номер обращения')):
+                                                      description='Номер обращения'),
+                                    request_text=Query(None,
+                                                      description='Текст обращения'
+                                                      )):
     inst = main_workers.ResponseCreatorHTML(email_for_response=email_to,
-                                            request_num=request_num)
+                                            request_num=request_num,
+                                            request_text=request_text)
     return await inst.form_send_mail()

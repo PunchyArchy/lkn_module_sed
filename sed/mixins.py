@@ -62,11 +62,17 @@ class MessageResponseCreator:
 
 class MessageResponseCreatorHTML(MessageResponseCreator):
     html_file_path = None
+    request_text = None
 
     def get_msg_body(self):
         html = open(self.html_file_path)
         html_read = html.read()
-        html_read = html_read.replace('MAIN_NUMBER_REPLACE_FOR', self.request_identifier)
+        html_read = html_read.replace('MAIN_NUMBER_REPLACE_FOR',
+                                      self.request_identifier)
+        if not self.request_text:
+            self.request_text = ""
+        html_read = html_read.replace('REQUEST_TEXT_REPLACE_FOR',
+                                      self.request_text)
         return html_read
 
 
