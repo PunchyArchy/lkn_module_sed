@@ -124,6 +124,7 @@ class EntityMessageBodyCreator(MessageBodyCreator):
         body = f'Название компании - {self.company_name}\n' \
                f'ИНН компании - {self.company_inn}\n' \
                f'КПП компании - {self.company_kpp}\n\n' \
+               f'Контактное лицо - {self.contact_person}\n' \
                f'Телефон контактного лица - {self.contact_phone}\n' \
                f'Email контактного лица - {self.company_email}\n' \
                f'Запрос - {self.user_text}\n'
